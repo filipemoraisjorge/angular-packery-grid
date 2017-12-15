@@ -1,0 +1,10 @@
+<header>
+  <button onClick={this.addItem}>Add Item</button>
+  <hr />
+</header>
+<div id='grid'>
+  <div *ngFor="let item of items" [class]="getGridItemClass(item)" [ngStyle]="getGridItemStyle(item)">
+    <p>item {{item.text}}</p>
+    <p>{{item.w}}x{{item.h}}</p>
+  </div>
+</div>
