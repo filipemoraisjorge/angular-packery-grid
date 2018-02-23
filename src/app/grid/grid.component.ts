@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { AfterViewInit, OnChanges } from '@angular/core/src/metadata/lifecycle_hooks';
 import Packery from 'packery';
 
 @Component({
@@ -8,7 +8,7 @@ import Packery from 'packery';
   styleUrls: ['./grid.component.css']
 })
 
-export class GridComponent implements OnInit, AfterViewInit {
+export class GridComponent implements OnInit, AfterViewInit, OnChanges {
 
   public items: Item[];
   private pckry: Packery;
@@ -54,32 +54,57 @@ export class GridComponent implements OnInit, AfterViewInit {
     return itemStyles;
   }
 
-  constructor() { }
-
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.resizeItems(event);
   }
 
   ngOnInit() {
-    this.items = this.randomizeItems([], 55);
+    this.items = this.randomizeItems([], 0);
   }
 
   ngAfterViewInit() {
 
     const grid = document.getElementById('grid');
-    this.pckry = new Packery(grid, {
-      itemSelector: '.grid-item',
-      // disable window resize behavior
-      shiftResize: true,
-      resize: true,
-      gutter: 0,
-      stagger: 0
-    });
-    this.resizeItems(true);
+      this.pckry = new Packery(grid, {
+        itemSelector: '.grid-item',
+        // disable window resize behavior
+        shiftResize: true,
+        resize: true,
+        gutter: 0,
+        stagger: 0
+      });
+      this.resizeItems(true);
+
+//    this.pckry = this.pckry.bind(this);
 
   }
 
+  ngOnChanges(changes) {
+    console.log('onchages', changes);
+  }
+
+  public addItem() {
+    const item = this.randomizeItems([], 1)[0];
+    item.text = "new item";
+    this.items.unshift(item);
+    this.pckry.prepended('<div class="grid-item gridItem1x1"><p>injected</p></div>');
+    console.log(this.items);
+    this.pckry.reloadItems();
+    const elements = this.pckry.getItemElements();
+    console.log('reload', elements);
+    this.pckry.layout();
+    console.log('layout');
+  }
+
+  layoutItems() {
+    this.pckry.layout();
+
+  }
+  reloadItems() {
+    this.pckry.reloadItems();
+
+  }
 
   getGridItemStyle(item: Item): any {
     return this.styles[`gridItem${item.w}x${item.h}`];
@@ -105,8 +130,9 @@ export class GridComponent implements OnInit, AfterViewInit {
           if (formatElements !== null) {
             for (let i = 0; i < formatElements.length; i++) {
               const elem = formatElements.item(i);
-              elem.style.width = this.styles[format].width;
-              elem.style.height = this.styles[format].height;
+              console.log(elem);
+              // elem.style.width = this.styles[format].width;
+              // elem.style.height = this.styles[format].height;
             }
           }
         });
